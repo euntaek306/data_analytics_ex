@@ -1,0 +1,60 @@
+from bs4 import BeautifulSoup as BS
+import urllib.request as req
+import datetime
+import os
+import csv
+from datetime import datetime
+
+
+#HTML 가져오기
+url = "https://news.naver.com/section/100"
+html = req.urlopen(url)
+
+# HTML 파싱하기
+soup = BS(html, "html.parser")
+
+# 반복되는 패턴을 찾아서 셀렉터로 지정
+# ul.sa_list > li
+lis = soup.select("ul.sa_list > li")
+
+news_list =[]
+for li in lis:
+    title = li.select_one("strong.sa_text_strong").get_text().strip()
+    press = li.select_one("div.sa_text_press").get_text().strip()
+    if img_url:
+        img_url = img_url.get("src") or img_url.get("data-src")
+    else:
+        img_url = "이미지 없음"
+        img_url = img_url.split("?")[0]
+    #추출한 목록 프린트
+    # print(f"{title},{press},{img_url}")
+
+    # 하나의 뉴스 정보를 전체 목록 리스트에 추가
+    news_list.append([f"{title}. {press}, {img_url}"])
+
+print(news_list)
+
+ 
+#폴더 만들기
+folder = "news_data"
+filename = (f"{timestamp}")
+base_path = 'news_data'
+os.makedirs(base_path, exist_ok=True)
+
+# 파일에 저장하기
+base_path = "news_data"
+# 오늘 날짜, 시간 파일로 저장
+
+# 1. 현재 날짜·시간 가져오기
+now = datetime.now()
+
+# 2. 원하는 형식으로 파일명 생성
+timestamp = now.strftime("%Y-%m-%d-%H") + ".csv"
+
+
+# 3. CSV 파일 저장(2차원 리스트여야함)
+with open(f"{base_path}/{filename}", "w", newline="", encoding="utf-8") as f:
+    writer = csv.writer(f)
+    writer.writerows(news_list)
+
+print(f"저장 완료: {filename}")
